@@ -1,0 +1,6 @@
+[client]
+
+database= house_party
+user=edu
+password=kali@linux
+default-character-set=utf8
