@@ -9,7 +9,10 @@ class RoomSerializer(serializers.ModelSerializer):#handles outgoing response by 
         model=Room
         fields='__all__'
 
-class CreateRoomSerializer(serializers.ModelSerializer):#handles incoming request and makes sure the posted payload is the same as what we expect
+'''
+:handles incoming request and makes sure the posted payload is the same as what we expect
+'''
+class CreateRoomSerializer(serializers.ModelSerializer):
     class Meta:
         model=Room
         fields=('guest_can_pause','votes_to_skip')
