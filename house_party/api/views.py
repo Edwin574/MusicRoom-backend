@@ -6,7 +6,7 @@ from rest_framework.views import APIView
 
 # Create your views here.
 
-class RoomView(generics.ListCreateAPIView):
+class RoomView(generics.ListAPIView):
     queryset=Room.objects.all()
     serializer_class=RoomSerializer
 
@@ -31,10 +31,13 @@ class CreateRoomView(APIView):
                 room.guest_can_pause=guest_can_pause
                 room.votes_to_skip=votes_to_skip
                 room.save(update_fields=['guest_can_pause','votes_to_skip','created_at'])
+                self.request.session['room_code']=room.room_code
                 return Response(RoomSerializer(room).data,status=status.HTTP_200_OK)
             else:
                 room=Room(room_host=host_session_id,guest_can_pause=guest_can_pause,votes_to_skip=votes_to_skip)
                 room.save()
+                self.request.session['room_code']=room.room_code
+
                 return Response(RoomSerializer(room).data,status=status.HTTP_201_CREATED)
         return Response({'Bad request':'Invalid data...'},status=status.HTTP_400_BAD_REQUEST)
     
@@ -53,3 +56,19 @@ class GetRoom(APIView):
                 return Response(data,status=status.HTTP_200_OK)
             return Response({'Room Not Found':'Invalid Room Code'},status=status.HTTP_404_NOT_FOUND)
         return Response({'Bad Request':'Code parameter not found in request'},status=status.HTTP_400_BAD_REQUEST)
+
+class JoinRoom(APIView):
+    join_code='code'
+    def post(self,request,format=None):
+        if not self.request.session.exist(self.request.sessions.session_key):
+            self.request.session.create()
+        
+        code=request.data.get(self.join_code)
+        if code!=None:
+            room_result=Room.objects.filter(room_code=code)
+            if len(room_result)>0:
+                room=room_result[0]
+                self.request.session['room_code']=code
+                return Response({'message':'Rooom Joined Successfully'},status=status.HTTP_200_OK)
+            Response({'Bad Request':'Invalid Room code'},status=status.HTTP_400_BAD_REQUEST)
+        return Response({'Bad Request':'Invalid post data, did not find the room code'},status=status.HTTP_400_BAD_REQUEST)
