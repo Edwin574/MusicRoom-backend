@@ -1,5 +1,5 @@
 from .models import Room
-from .serializers import RoomSerializer,CreateRoomSerializer
+from .serializers import RoomSerializer,CreateRoomSerializer,UpdateRoomSerializer
 from rest_framework import generics,status
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -118,6 +118,15 @@ class LeaveRoom(APIView):
 class UpdateRoom(APIView):
     '''
     :Updating details of a specific room.
-    '''
     
+    '''
+    serializer_class=UpdateRoomSerializer
+    
+    def patch(self,request,format=None):
+        serializer=self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            pass
+        return Response({'Bad Request':'Invalid data...'},status=status.HTTP_400_BAD_REQUEST)
+        
+        
     pass
