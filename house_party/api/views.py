@@ -99,6 +99,7 @@ class UserInRoom(APIView):
         }
         
         return JsonResponse(data,status=status.HTTP_200_OK)
+ 
     
 class LeaveRoom(APIView):
     '''
@@ -142,10 +143,6 @@ class UpdateRoom(APIView):
             room.guest_can_pause=guest_can_pause
             room.votes_to_skip=votes_to_skip
             room.save(update_fields=['votes_to_skip','guest_can_pause'])
-            return Response(RoomSerializer(room).data,status=status.HTTP_200_OK)
-             
+            return Response(RoomSerializer(room).data,status=status.HTTP_200_OK)   
                 
         return Response({'Bad Request':'Invalid data...'},status=status.HTTP_400_BAD_REQUEST)
-        
-        
-    pass
