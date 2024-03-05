@@ -27,7 +27,7 @@ class UpdateRoomSerializer(serializers.ModelSerializer):
     """
     -handles incoming request and makes sure the posted payload is the same as what we expect
     """
-    code = serializers.CharField(validtors=[])
+    # code = serializers.CharField(validtors=[])
 
     class Meta:
         model = Room
