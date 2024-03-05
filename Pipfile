@@ -8,6 +8,7 @@ django = "*"
 mysqlclient = "*"
 djangorestframework = "*"
 pytz = "*"
+requests = "*"
 
 [dev-packages]
 
