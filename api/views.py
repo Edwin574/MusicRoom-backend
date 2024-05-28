@@ -10,7 +10,7 @@ from django.http import JsonResponse
 
 class RoomView(generics.ListAPIView):
     '''
-    :View all available rooms
+    View all available rooms
     '''
     queryset = Room.objects.all()
     serializer_class = RoomSerializer
@@ -18,7 +18,7 @@ class RoomView(generics.ListAPIView):
 
 class CreateRoomView(APIView):
     '''
-    :Create a room if none exists and update room details if it exists.
+    Create a room if none exists and update room details if it exists.
     '''
     serializer_class = CreateRoomSerializer
 
@@ -52,7 +52,7 @@ class CreateRoomView(APIView):
 
 class GetRoom(APIView):
     '''
-    :Getting details of a specific room by submitting the room code
+    Getting details of a specific room by submitting the room code
     '''
     serializer_class = RoomSerializer
     lookup_url_kwarg = 'code'
