@@ -1,4 +1,5 @@
 from django.shortcuts import render,redirect
+from api.models import Room
 
 
 from .credentials import CLIENT_ID,CLIENT_SECRET,REDIRECT_URI
@@ -9,7 +10,7 @@ from rest_framework.views import APIView
 from requests import Request,post
 from rest_framework import status
 from rest_framework.response import Response
-from .utility import update_or_create_tokens,is_user_authenticated
+from .utility import *
 
 
 class AuthenticationURL(APIView):
@@ -60,6 +61,51 @@ class UserIsAuthenticated(APIView):
         is_authenticated=is_user_authenticated(request.session.session_key)
         
         return Response({"status":is_authenticated},status=status.HTTP_200_OK)
+        
+class CurrentSong(APIView):
+    def get(self,request,format=None):
+        room_code=self.request.session.get('room_code')
+        room=Room.objects.filter(room_code=room_code)
+        if room.exists():
+            room=room[0]
+        else:
+            return Response({},status=status.HTTP_404_NOT_FOUND)
+        room_host=room.room_host
+        endpoint="player/currently-playing"
+        response=handle_api_request(session_key=room_host,endpoint=endpoint)
+        
+        if 'error' in response or 'item' not in response:
+            return Response({},status=status.HTTP_204_NO_CONTENT)
+        
+        item=response.get('item')
+        duration=item.get('duration_ms')
+        progress=response.get('progress_ms')
+        album_cover=item.get('album').get('images')[0].get('url')
+        is_playing=response.get('is_playing')
+        song_id=item.get('id')
+        
+        arstist_names_string=""
+        
+        for i,artist in enumerate(item.get('artists')):
+            if i>0:
+                arstist_names_string+=","
+            name=artist.get('name')
+            arstist_names_string += name
+        song={
+            'title':item.get('name'),
+            'artist':arstist_names_string,
+            'duration':duration,
+            'time':progress,
+            'image_url':album_cover,
+            'is_playing':is_playing,
+            'votes':0,
+            'id':song_id
+        }
+        
+        return Response(song,status=status.HTTP_200_OK)
+    
+    
+        
         
 
 
