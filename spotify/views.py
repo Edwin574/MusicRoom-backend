@@ -1,18 +1,20 @@
-from django.shortcuts import render
+from django.shortcuts import render,redirect
 
-# Create your views here.
 
-from  .credentials import CLIENT_ID,CLIENT_SECRET,REDIRECT_URI
+from .credentials import CLIENT_ID,CLIENT_SECRET,REDIRECT_URI
 
 from rest_framework.views import APIView 
+# from rest_famework.requests import Request,post
+# from rest_framework.request import Request,post
 from requests import Request,post
 from rest_framework import status
 from rest_framework.response import Response
+from .utility import update_or_create_tokens,is_user_authenticated
 
 
 class AuthenticationURL(APIView):
     
-    def get(self,request,format=None):
+    def get(self, request,format=None):
         scopes="user-read-currently-playing user-modify-playback-state user-read-playback-state"
         
         url=Request('GET','https://accounts.spotify.com/authorize?',params={
@@ -45,3 +47,20 @@ def spotify_callback(request,format=None):
     refresh_token=token.get('refresh_token')
     expires_in=token.get('expires_in')
     error=token.get('error')
+    
+    if not request.session.exists(request.session.session_key):
+        request.session.create()
+    
+    update_or_create_tokens(session_key=request.session.session_key ,access_token=access_token,refresh_token=refresh_token,token_type=token_type,expires_in=expires_in)
+    
+    return redirect('https://open.spotify.com/') #the url you want to redirect to
+
+class UserIsAuthenticated(APIView):
+    def get(self,request,format=None):
+        is_authenticated=is_user_authenticated(request.session.session_key)
+        
+        return Response({"status":is_authenticated},status=status.HTTP_200_OK)
+        
+
+
+    
