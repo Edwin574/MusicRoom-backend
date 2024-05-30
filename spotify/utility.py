@@ -84,6 +84,8 @@ def play_song(session_key):
 def pause_song(session_key):
         return handle_api_request(session_key=session_key,endpoint="player/pause",put_=True)
 
+def skip_song(session_key):
+    return handle_api_request(session_key=session_key,endpoint="player/next",post_=True)
          
          
         

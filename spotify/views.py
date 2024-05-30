@@ -1,5 +1,6 @@
 from django.shortcuts import render,redirect
 from api.models import Room
+from .models import Vote
 
 
 from .credentials import CLIENT_ID,CLIENT_SECRET,REDIRECT_URI
@@ -91,6 +92,7 @@ class CurrentSong(APIView):
                 arstist_names_string+=","
             name=artist.get('name')
             arstist_names_string += name
+        votes=len(Vote.objects.filter(room=room,song_id=song_id))
         song={
             'title':item.get('name'),
             'artist':arstist_names_string,
@@ -98,11 +100,19 @@ class CurrentSong(APIView):
             'time':progress,
             'image_url':album_cover,
             'is_playing':is_playing,
-            'votes':0,
+            'votes':votes,
+            'votes_required':room.votes_to_skip,
             'id':song_id
         }
+        self.update_room_curr_song(room,song_id)
         
         return Response(song,status=status.HTTP_200_OK)
+    def update_room_curr_song(self,room,song_id):
+        current_song=room.current_song_id
+        if current_song!=song_id:
+            room.current_song_id=song_id
+            room.save(update_fields=['current_song_id'])
+            votes=Vote.objects.filter(room=room).delete()
     
 class PauseSong(APIView):
     def put(self,response,format=None):
@@ -119,7 +129,21 @@ class PlaySong(APIView):
         if self.request.session_key==room.room_host or room.guest_can_pause:
             play_song(room.room_host)
             return Response({},status=status.HTTP_204_NO_CONTENT)
-        return Response({},status=status.HTTP_403_FORBIDDEN)         
+        return Response({},status=status.HTTP_403_FORBIDDEN)   
+    
+class SkipSong(APIView):
+    def post(self,response,format=None):
+        room_code=self.request.session.get('room_code')
+        room=Room.objects.filter(room_code=room_code)[0]
+        votes=Vote.objects.filter(room=room,song_id=room.current_song_id)
+        votes_to_skip=room.votes_to_skip
+        if self.request.session_key==room.room_host or len(votes)+1>=votes_to_skip:
+            votes.delete()
+            skip_song(room.room_host) 
+        else:
+            vote=Vote(user=self.request.session_key,room=room,song_id=room.current_song_id)
+            vote.save()
+        return Response({},status=status.HTTP_204_NO_CONTENT)
         
         
 
