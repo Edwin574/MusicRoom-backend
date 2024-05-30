@@ -77,7 +77,7 @@ class JoinRoom(APIView):
     join_code = 'code'
 
     def post(self, request, format=None):
-        if not self.request.session.exist(self.request.sessions.session_key):
+        if not self.request.session.exists(self.request.session.session_key):
             self.request.session.create()
 
         code = request.data.get(self.join_code)
