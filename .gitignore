@@ -1,4 +1,4 @@
-.vscode
-.idea
+/.vscode
+/.idea
 
-credentials.py
+spotify/credentials.py
