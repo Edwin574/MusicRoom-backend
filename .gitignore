@@ -1,4 +1,15 @@
-/.vscode
-/.idea
+#IDE directories
+/.vscode/
+/.idea/ 
+
+#python virtual environments
+/venv/
+/env/
+
+#environment variables
+/.env
+.env.local
+.env.*.local
+.env.*.secret
 
 spotify/credentials.py

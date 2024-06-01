@@ -1,13 +1,11 @@
 from django.shortcuts import render,redirect
 from api.models import Room
 from .models import Vote
+from django.conf import settings
 
-
-from .credentials import CLIENT_ID,CLIENT_SECRET,REDIRECT_URI
 
 from rest_framework.views import APIView 
-# from rest_famework.requests import Request,post
-# from rest_framework.request import Request,post
+
 from requests import Request,post
 from rest_framework import status
 from rest_framework.response import Response
@@ -15,15 +13,16 @@ from .utility import *
 
 
 class AuthenticationURL(APIView):
-    
+    # client_id = settings.CLIENT_ID
+    # redirect_uri = settings.REDIRECT_URI
     def get(self, request,format=None):
         scopes="user-read-currently-playing user-modify-playback-state user-read-playback-state"
         
         url=Request('GET','https://accounts.spotify.com/authorize?',params={
             "scope":scopes,
             "response_type":"code",
-            "redirect_uri":REDIRECT_URI,
-            "client_id":CLIENT_ID       
+            "redirect_uri":settings.REDIRECT_URI,
+            "client_id":settings.CLIENT_ID       
         }).prepare().url
         
         return Response({'url':url},status=status.HTTP_200_OK)
@@ -39,9 +38,9 @@ def spotify_callback(request,format=None):
         token=post("https://accounts.spotify.com/api/token",data={
             "grant_type":"authorization_code",
             "code":code,
-            "redirect_uri":REDIRECT_URI,
-            "client_id":CLIENT_ID,
-            "client_secret":CLIENT_SECRET
+            "redirect_uri":settings.REDIRECT_URI,
+            "client_id":settings.CLIENT_ID,
+            "client_secret":settings.CLIENT_SECRET
         }).json()
         
     access_token=token.get('access_token')
