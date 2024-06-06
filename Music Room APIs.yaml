@@ -1,0 +1,328 @@
+openapi: 3.0.3
+info:
+  title: Music Room APIs
+  version: 1.0.0
+  description: A collaborative music player
+paths:
+  /api/createroom:
+    post:
+      operationId: api_createroom_create
+      description: Create a room if none exists and update room details if it exists.
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateRoom'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CreateRoom'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CreateRoom'
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateRoom'
+          description: ''
+  /api/get-room:
+    get:
+      operationId: api_get_room_retrieve
+      description: Getting details of a specific room by submitting the room code
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Room'
+          description: ''
+  /api/join-room:
+    post:
+      operationId: api_join_room_create
+      description: :Functionality for joining room by submitting the given room code.
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Room'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Room'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Room'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Room'
+          description: ''
+  /api/leave-room:
+    post:
+      operationId: api_leave_room_create
+      description: |-
+        :Leave a particular room and if the user is the host of the room we delete
+        the room from the database.
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Room'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Room'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Room'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Room'
+          description: ''
+  /api/rooms:
+    get:
+      operationId: api_rooms_list
+      description: View all available rooms
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Room'
+          description: ''
+  /api/update-room:
+    patch:
+      operationId: api_update_room_partial_update
+      description: :Updating details of a specific room.
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedUpdateRoom'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedUpdateRoom'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedUpdateRoom'
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateRoom'
+          description: ''
+  /api/user-in-room:
+    get:
+      operationId: api_user_in_room_retrieve
+      description: :Check if a user exists in a room
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Room'
+          description: ''
+  /spotify/current-song:
+    get:
+      operationId: spotify_current_song_retrieve
+      tags:
+      - spotify
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /spotify/get-auth-url:
+    get:
+      operationId: spotify_get_auth_url_retrieve
+      tags:
+      - spotify
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /spotify/is-authenticated:
+    get:
+      operationId: spotify_is_authenticated_retrieve
+      tags:
+      - spotify
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /spotify/pause-song:
+    put:
+      operationId: spotify_pause_song_update
+      tags:
+      - spotify
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /spotify/play-song:
+    put:
+      operationId: spotify_play_song_update
+      tags:
+      - spotify
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /spotify/skip-song:
+    post:
+      operationId: spotify_skip_song_create
+      tags:
+      - spotify
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+components:
+  schemas:
+    CreateRoom:
+      type: object
+      description: -handles incoming request and makes sure the posted payload is
+        the same as what we expect
+      properties:
+        guest_can_pause:
+          type: boolean
+        votes_to_skip:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+    PatchedUpdateRoom:
+      type: object
+      description: -handles incoming request and makes sure the posted payload is
+        the same as what we expect
+      properties:
+        guest_can_pause:
+          type: boolean
+        votes_to_skip:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        room_code:
+          type: string
+          maxLength: 8
+    Room:
+      type: object
+      description: handles outgoing response by representing the data in a better
+        format.
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        room_code:
+          type: string
+          maxLength: 8
+        room_host:
+          type: string
+          maxLength: 50
+        guest_can_pause:
+          type: boolean
+        votes_to_skip:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        current_song_id:
+          type: string
+          nullable: true
+          maxLength: 50
+      required:
+      - created_at
+      - id
+      - room_host
+    UpdateRoom:
+      type: object
+      description: -handles incoming request and makes sure the posted payload is
+        the same as what we expect
+      properties:
+        guest_can_pause:
+          type: boolean
+        votes_to_skip:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        room_code:
+          type: string
+          maxLength: 8
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: sessionid

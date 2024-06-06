@@ -10,6 +10,7 @@ djangorestframework = "*"
 pytz = "*"
 requests = "*"
 python-decouple = "*"
+drf-spectacular = {extras = ["sidecar"], version = "*"}
 
 [dev-packages]
 

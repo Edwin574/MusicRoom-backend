@@ -5,6 +5,7 @@ from django.conf import settings
 
 
 from rest_framework.views import APIView 
+from rest_framework.generics import GenericAPIView
 
 from requests import Request,post
 from rest_framework import status
@@ -12,7 +13,7 @@ from rest_framework.response import Response
 from .utility import *
 
 
-class AuthenticationURL(APIView):
+class AuthenticationURL(GenericAPIView):
     # client_id = settings.CLIENT_ID
     # redirect_uri = settings.REDIRECT_URI
     def get(self, request,format=None):
@@ -56,13 +57,13 @@ def spotify_callback(request,format=None):
     
     return redirect('https://open.spotify.com/') #the url you want to redirect to
 
-class UserIsAuthenticated(APIView):
+class UserIsAuthenticated(GenericAPIView):
     def get(self,request,format=None):
         is_authenticated=is_user_authenticated(request.session.session_key)
         
         return Response({"status":is_authenticated},status=status.HTTP_200_OK)
         
-class CurrentSong(APIView):
+class CurrentSong(GenericAPIView):
     def get(self,request,format=None):
         room_code=self.request.session.get('room_code')
         room=Room.objects.filter(room_code=room_code)
@@ -113,7 +114,7 @@ class CurrentSong(APIView):
             room.save(update_fields=['current_song_id'])
             votes=Vote.objects.filter(room=room).delete()
     
-class PauseSong(APIView):
+class PauseSong(GenericAPIView):
     def put(self,response,format=None):
         room_code=self.request.session.get('room_code')
         room=Room.objects.filter(room_code=room_code)[0]
@@ -130,7 +131,7 @@ class PlaySong(APIView):
             return Response({},status=status.HTTP_204_NO_CONTENT)
         return Response({},status=status.HTTP_403_FORBIDDEN)   
     
-class SkipSong(APIView):
+class SkipSong(GenericAPIView):
     def post(self,response,format=None):
         room_code=self.request.session.get('room_code')
         room=Room.objects.filter(room_code=room_code)[0]
