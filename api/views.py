@@ -3,6 +3,7 @@ from .serializers import RoomSerializer, CreateRoomSerializer, UpdateRoomSeriali
 from rest_framework import generics, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.generics import GenericAPIView
 from django.http import JsonResponse
 
 
@@ -16,7 +17,7 @@ class RoomView(generics.ListAPIView):
     serializer_class = RoomSerializer
 
 
-class CreateRoomView(APIView):
+class CreateRoomView(GenericAPIView):
     '''
     Create a room if none exists and update room details if it exists.
     '''
@@ -50,7 +51,7 @@ class CreateRoomView(APIView):
         return Response({'Bad request': 'Invalid data...'}, status=status.HTTP_400_BAD_REQUEST)
 
 
-class GetRoom(APIView):
+class GetRoom(GenericAPIView):
     '''
     Getting details of a specific room by submitting the room code
     '''
@@ -70,10 +71,11 @@ class GetRoom(APIView):
         return Response({'Bad Request': 'Code parameter not found in request'}, status=status.HTTP_400_BAD_REQUEST)
 
 
-class JoinRoom(APIView):
+class JoinRoom(GenericAPIView):
     '''
     :Functionality for joining room by submitting the given room code.
     '''
+    serializer_class=RoomSerializer
     join_code = 'code'
 
     def post(self, request, format=None):
@@ -92,11 +94,11 @@ class JoinRoom(APIView):
                         status=status.HTTP_400_BAD_REQUEST)
 
 
-class UserInRoom(APIView):
+class UserInRoom(GenericAPIView):
     '''
     :Check if a user exists in a room
     '''
-
+    serializer_class=RoomSerializer
     def get(self, request, format=None):
         if not self.request.session.exists(self.request.session.session_key):
             self.request.session.create()
@@ -108,12 +110,12 @@ class UserInRoom(APIView):
         return JsonResponse(data, status=status.HTTP_200_OK)
 
 
-class LeaveRoom(APIView):
+class LeaveRoom(GenericAPIView):
     '''
     :Leave a particular room and if the user is the host of the room we delete
     the room from the database.
     '''
-
+    serializer_class = RoomSerializer
     def post(self, request, format=None):
         if 'room_code' in self.request.session:
             self.request.session.pop('room_code')
@@ -125,7 +127,7 @@ class LeaveRoom(APIView):
         return Response({'Message': 'Success'}, status=status.HTTP_200_OK)
 
 
-class UpdateRoom(APIView):
+class UpdateRoom(GenericAPIView):
     '''
     :Updating details of a specific room.
     
